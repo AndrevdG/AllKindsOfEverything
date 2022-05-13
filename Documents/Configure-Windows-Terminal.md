@@ -10,4 +10,5 @@ https://www.hanselman.com/blog/my-ultimate-powershell-prompt-with-oh-my-posh-and
 - (Optional) install github cli: winget install github.cli // useful if you work with github.
 - (Optional) install git: winget install git.git // useful for azure devops (and others)
 - install-module terminal-icons
+- edit $profile and add 'import-module Terminal-Icons'
 - (Optional) change the opacity of terminal. Add "opacity": xx under profiles in settings.json (xx=percentage. 75/80 seems to be a nice starting point)
