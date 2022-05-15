@@ -6,5 +6,5 @@ This is public to allow linking to documentation files from other sources and yo
 
 # Documents:
 
-- [Configure Windows Terminal (Scott Hanselman)](Configure-Windows-Terminal.md)
+- [Configure Windows Terminal](Configure-Windows-Terminal.md)
 - [Configure Code Profiles](Configure-Code-Profiles.md)
