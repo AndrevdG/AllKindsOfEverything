@@ -1,0 +1,130 @@
+{
+    "general": {
+        "resourceGroupAssignments": [
+            {
+                // adds a groups object id to the 'Virtual Machine Administrator Login', allowing admin login to vms
+                // https://docs.microsoft.com/en-us/azure/active-directory/devices/howto-vm-sign-in-azure-ad-linux
+                // 
+                // f.i. add a vm to linux (or WSL) ssh config: az ssh vm -n myVM -g AzureADLinuxVM
+                "ObjectId": "a0e0374d-4534-4d6b-b49a-f0babd7ae110",
+                "principalType": "Group",
+                "roleDefinitionId": "1c0163c0-47e6-4577-8991-ea5c82e286e4"
+            }
+        ]
+    },
+    "hub": {
+        //"subscriptionId": "",
+        "rsg": {
+            "name": "rg-__projectname__-hub",
+            "location": "westeurope"
+        },
+        "vnet": {
+            "name": "vnt-__projectname__-hub",
+            "addressSpace": [
+                "10.10.0.0/16"
+            ],
+            "subnets": [
+                {
+                    "name": "firewall",
+                    "range": "10.10.0.0/24",
+                    "noRouteTable": true,
+                    "nsg": {
+                        "allowedIps": [
+                            "77.249.48.178/32"
+                        ],
+                        "allowInternetForwarding": true
+                    }
+                },
+                {
+                    "name": "shared",
+                    "range": "10.10.1.0/24"
+                },
+                {
+                    "name": "GatewaySubnet",
+                    "range": "10.10.2.0/24",
+                    "noNetworkSecurityGroup": true
+                }
+            ]
+        },
+        "vm": [
+            {
+                "baseName": "fw-__projectname__-hub",
+                "size": "Standard_B1s",
+                "adminUserName": "fw-admin",
+                "subnet": "firewall",
+                "imageReference": {
+                    "publisher": "canonical",
+                    "offer": "0001-com-ubuntu-server-focal",
+                    "sku": "20_04-lts-gen2",
+                    "version": "latest"
+                },
+                "createPip": true,
+                "createPipStatic": true,
+                "enableIPForwarding": true,
+                "staticIp": true
+            }
+        ]
+    },
+    "spoke": [
+        {
+            //"subscriptionId": "",
+            "rsg": {
+                "name": "rg-__projectname__-spoke1",
+                "location": "westeurope"
+            },
+            "vnet": {
+                "name": "vnt-__projectname__-spoke1",
+                "addressSpace": [
+                    "10.11.0.0/16"
+                ],
+                "subnets": [
+                    {
+                        "name": "frontend",
+                        "range": "10.11.0.0/24"
+                    },
+                    {
+                        "name": "backend",
+                        "range": "10.11.1.0/24"
+                    }
+                ]
+            }
+        },
+        {
+            //"subscriptionId": "",
+            "rsg": {
+                "name": "rg-__projectname__-spoke2",
+                "location": "westeurope"
+            },
+            "vnet": {
+                "name": "vnt-__projectname__-spoke2",
+                "addressSpace": [
+                    "10.12.0.0/16"
+                ],
+                "subnets": [
+                    {
+                        "name": "frontend",
+                        "range": "10.12.0.0/24"
+                    },
+                    {
+                        "name": "backend",
+                        "range": "10.12.1.0/24"
+                    }
+                ]
+            },
+            "vm": [
+                {
+                    "baseName": "vm-__projectname__-spoke2-be",
+                    "size": "Standard_B1s",
+                    "count": 1,
+                    "subnet": "backend",
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "0001-com-ubuntu-server-focal",
+                        "sku": "20_04-lts-gen2",
+                        "version": "latest"
+                    }
+                }
+            ]
+        }
+    ]
+}

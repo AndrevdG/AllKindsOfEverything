@@ -1,0 +1,65 @@
+param vnetName string
+param location string
+param subnets array
+param fwIp string = ''
+param spokeAddressRanges array = []
+
+// only used for deployment names
+param postFix string = utcNow()
+
+var routesGwSn = [for spoke in spokeAddressRanges: {
+  name: 'route-${spoke.name}'
+    properties: {
+      addressPrefix: spoke.range
+      nextHopType: 'VirtualAppliance'
+      nextHopIpAddress: fwIp
+    }
+}]
+
+var routesPerSn = [for item in subnets: !(item.name == 'GatewaySubnet') ? [ 
+   {
+    name: 'default'
+    properties: {
+      addressPrefix: '0.0.0.0/0'
+      nextHopType: 'VirtualAppliance'
+      nextHopIpAddress: fwIp
+    }
+  } 
+]: routesGwSn]
+
+resource rt 'Microsoft.Network/routeTables@2021-08-01' = [for (subnet, i) in subnets: if (!(contains(subnet, 'noRouteTable') && subnet.noRouteTable == true)) {
+  name: 'rt-${subnet.name}'
+  location: location
+  properties: {
+    routes: routesPerSn[i]
+  }
+}]
+
+module existing_vnet 'util-existing-vnet-config.bicep' = {
+  name: 'existing-${vnetName}-${postFix}'
+  params: {
+    subnets: subnets
+    vnetName: vnetName
+  }
+}
+
+@batchSize(1)
+resource update_sn 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' = [for (subnet, i) in subnets: if (!(contains(subnet, 'noRouteTable') && subnet.noRouteTable == true)) {
+  name: '${vnetName}/${subnet.name}'
+  dependsOn: [
+    existing_vnet
+  ]
+  properties: {
+    addressPrefix: subnet.range
+    routeTable: !empty(rt[i].id) ? {
+      id: rt[i].id
+    } : null
+    networkSecurityGroup: contains(existing_vnet.outputs.existing_sn[i].properties, 'networkSecurityGroup') && !empty(existing_vnet.outputs.existing_sn[i].properties.networkSecurityGroup.id) ? {
+      id: existing_vnet.outputs.existing_sn[i].properties.networkSecurityGroup.id
+    } : null
+    privateEndpointNetworkPolicies: contains(subnet, 'privateEndpointNetworkPolicies') ? subnet.privateEndpointNetworkPolicies : null
+  }
+}]
+
+
+output routesPerSn array = routesPerSn
