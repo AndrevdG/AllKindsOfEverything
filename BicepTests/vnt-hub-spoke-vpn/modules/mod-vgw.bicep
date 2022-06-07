@@ -23,6 +23,7 @@ resource vgw 'Microsoft.Network/virtualNetworkGateways@2021-08-01' = {
   properties: {
     activeActive: false
     enableBgp: false
+    vpnType: 'RouteBased'
     sku: {
       name: tier
       tier: tier

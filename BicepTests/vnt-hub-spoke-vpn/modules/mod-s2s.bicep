@@ -97,14 +97,14 @@ resource con 'Microsoft.Network/connections@2020-11-01' = {
       properties: vgw.properties
     }
     localNetworkGateway2: {
-      id: vgw.id
+      id: lgw.id
       properties: lgw.properties
     }
     sharedKey: sharedKey
     connectionType: connectionType
     connectionProtocol: connectionProtocol
     enableBgp: enableBgp
-    ipsecPolicies:[
+    ipsecPolicies: vgw.properties.sku.tier != 'Basic' ? [
       {
         saLifeTimeSeconds: saLifeTimeSeconds
         saDataSizeKilobytes: saDataSizeKilobytes
@@ -115,6 +115,6 @@ resource con 'Microsoft.Network/connections@2020-11-01' = {
         dhGroup: dhGroup
         pfsGroup: pfsGroup
       }
-    ]
+    ] : null
   }
 }

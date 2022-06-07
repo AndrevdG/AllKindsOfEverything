@@ -12,6 +12,7 @@
                 "roleDefinitionId": "1c0163c0-47e6-4577-8991-ea5c82e286e4"
             }
         ],
+        // Only applied if the gateway tier is higher than basic
         "vpnConnection": {
             "dhGroup": "ECP256",
             "ikeEncryption": "AES256",
@@ -154,7 +155,12 @@
             "subnets": [
                 {
                     "name": "resource",
-                    "range": "192.168.1.0/25"
+                    "range": "192.168.1.0/25",
+                    "nsg": {
+                        "allowedIps": [
+                            "77.249.48.178/32"
+                        ]
+                    }
                 },
                 {
                     "name": "GatewaySubnet",
