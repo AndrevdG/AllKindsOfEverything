@@ -102,7 +102,7 @@ module vgw 'modules/mod-vgw.bicep' = if(contains(config.hub, 'vgw')) {
   scope: resourceGroup(contains(config.hub, 'subscriptionId') ? config.hub.subscriptionId : subscription().subscriptionId, config.hub.rsg.name)
   name: '${config.hub.vgw.name}-${postfix}'
   dependsOn: [
-    vnets
+    routetables
   ]
   params: {
     name: config.hub.vgw.name
@@ -116,7 +116,7 @@ module vgw 'modules/mod-vgw.bicep' = if(contains(config.hub, 'vgw')) {
 module spokeResource 'modules/mod-spoke-resource.bicep' = [for (spoke, i) in config.spoke : {
   name: 'spokeResources-${i}-${postfix}'
   dependsOn: [
-    routetables
+    vgw
   ]
   params: {
     spoke: spoke

@@ -28,7 +28,7 @@ module nsgSpecific 'mod-nsg.bicep' = [ for subnet in subnets : if (contains(subn
   }
 }]
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: vnetName
   location: location
   properties: {
