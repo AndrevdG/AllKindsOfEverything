@@ -8,22 +8,18 @@ param subnets array
 param postfix string = utcNow()
 
 // create default nsg for each virtual network
-// resource nsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' = if (empty(nsgId)) {
-//   name: 'nsg-${vnetName}'
-//   location: location
-// }
 
 module nsg 'mod-nsg.bicep' = {
   name: 'nsg-${vnetName}-${postfix}'
   params: {
-    nsgName: 'nsg-${vnetName}'
+    nsgName: '${vnetName}-nsg'
     location: location
   }
 }
 
 // create non-default nsg if required
 module nsgSpecific 'mod-nsg.bicep' = [ for subnet in subnets : if (contains(subnet, 'nsg')) {
-  name: 'nsg-sn-${subnet.name}-${postfix}'
+  name: 'sn-${subnet.name}-${postfix}-nsg'
   params: {
     nsgName: 'nsg-sn-${subnet.name}'
     location: location

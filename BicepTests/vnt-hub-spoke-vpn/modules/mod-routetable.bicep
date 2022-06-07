@@ -28,7 +28,7 @@ var routesPerSn = [for item in subnets: !(item.name == 'GatewaySubnet') ? [
 ]: routesGwSn]
 
 resource rt 'Microsoft.Network/routeTables@2021-08-01' = [for (subnet, i) in subnets: if (!(contains(subnet, 'noRouteTable') && subnet.noRouteTable == true)) {
-  name: 'rt-${subnet.name}'
+  name: 'sn-${subnet.name}-rt'
   location: location
   properties: {
     routes: routesPerSn[i]

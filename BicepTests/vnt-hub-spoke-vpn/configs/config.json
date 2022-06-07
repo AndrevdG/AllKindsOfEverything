@@ -10,7 +10,15 @@
                 "principalType": "Group",
                 "roleDefinitionId": "1c0163c0-47e6-4577-8991-ea5c82e286e4"
             }
-        ]
+        ],
+        "vpnConnection": {
+            "dhGroup": "ECP256",
+            "ikeEncryption": "AES256",
+            "ikeIntegrity": "SHA256",
+            "ipsecEncryption": "AES256",
+            "ipsecIntegrity": "SHA256",
+            "pfsGroup": "ECP256"
+        }
     },
     "hub": {
         //"subscriptionId": "",
@@ -63,7 +71,11 @@
                 "enableIPForwarding": true,
                 "staticIp": true
             }
-        ]
+        ],
+        "vgw": {
+            "name": "vgw-__projectname__-hub01",
+            "tier": "Basic"
+        }
     },
     "spoke": [
         {
@@ -126,5 +138,49 @@
                 }
             ]
         }
-    ]
+    ],
+    "onPrem": {
+        //"subscriptionId": "",
+        "rsg": {
+            "name": "rg-__projectname__-onprem",
+            "location": "westeurope"
+        },
+        "vnet": {
+            "name": "vnt-__projectname__-onprem",
+            "addressSpace": [
+                "192.168.0.0/23"
+            ],
+            "subnets": [
+                {
+                    "name": "resource",
+                    "range": "192.168.1.0/25"
+                },
+                {
+                    "name": "GatewaySubnet",
+                    "range": "192.168.0.128/25",
+                    "noNetworkSecurityGroup": true
+                }
+            ]
+        },
+        "vm": [
+            {
+                "baseName": "vm-__projectname__-onprem",
+                "size": "Standard_B1s",
+                "subnet": "resource",
+                "imageReference": {
+                    "publisher": "canonical",
+                    "offer": "0001-com-ubuntu-server-focal",
+                    "sku": "20_04-lts-gen2",
+                    "version": "latest"
+                },
+                "createPip": true,
+                "createPipStatic": true,
+                "staticIp": true
+            }
+        ],
+        "vgw": {
+            "name": "vgw-__projectname__-onprem01",
+            "tier": "Basic"
+        }
+    }
 }

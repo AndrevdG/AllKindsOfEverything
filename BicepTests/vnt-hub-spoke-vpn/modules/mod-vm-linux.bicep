@@ -2,23 +2,6 @@ param config object
 param vnetId string
 param vmCustomDataBase64 string = ''
 
-// param adminUserName string
-// param adminSshKey string
-// param vmSize string
-
-// param nicName string
-// param vmName string
-// param diskNameOs string
-// param diskType string = 'Standard_LRS'
-// param createPip bool = false
-// param createPipStatic bool = true
-// param pipName string
-// param createSMId bool = true
-// param staticIp bool = false
-// param enableIPForwarding bool = false
-// param imageReference object
-// param subnetRef string
-
 // only used for deployment names
 param postFix string = utcNow()
 param location string = resourceGroup().location
@@ -30,9 +13,9 @@ var vmConfig = [for i in range (1, contains(config, 'count') ? config.count : 1)
   vmSize: config.size
   location: contains(config, 'location') && !empty(config.location) ? config.location : location
   vmName: '${config.baseName}${padLeft(i,2,'0')}'
-  pipName: 'pip-${config.baseName}${padLeft(i,2,'0')}'
-  nicName: 'nic-${config.baseName}${padLeft(i,2,'0')}'
-  diskNameOs: 'osd-${config.baseName}${padLeft(i,2,'0')}'
+  pipName: '${config.baseName}${padLeft(i,2,'0')}-pip'
+  nicName: '${config.baseName}${padLeft(i,2,'0')}-nic'
+  diskNameOs: '${config.baseName}${padLeft(i,2,'0')}-osd'
   diskType: contains(config, 'diskType') ? config.diskType : 'Standard_LRS'
   subnetRef: '${vnetId}/subnets/${config.subnet}'
   imageReference: config.imageReference
