@@ -5,7 +5,8 @@
                 // adds a groups object id to the 'Virtual Machine Administrator Login', allowing admin login to vms
                 // https://docs.microsoft.com/en-us/azure/active-directory/devices/howto-vm-sign-in-azure-ad-linux
                 // 
-                // f.i. add a vm to linux (or WSL) ssh config: az ssh vm -n myVM -g AzureADLinuxVM
+                // f.i. add a vm to linux (or WSL) ssh config: az ssh config --file ~/.ssh/config -n myVM -g AzureADLinuxVM
+                // Or login directly (windows and linux): az ssh vm -n myVM -g AzureADLinuxVM
                 "ObjectId": "a0e0374d-4534-4d6b-b49a-f0babd7ae110",
                 "principalType": "Group",
                 "roleDefinitionId": "1c0163c0-47e6-4577-8991-ea5c82e286e4"
