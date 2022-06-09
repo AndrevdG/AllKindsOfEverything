@@ -56,6 +56,9 @@
                 }
             ]
         },
+        "dns": [
+            "privatelink.blob.core.windows.net"
+        ],
         "vm": [
             {
                 "baseName": "fw-__projectname__-hub",
@@ -101,7 +104,16 @@
                         "range": "10.11.1.0/24"
                     }
                 ]
-            }
+            },
+            "sta": [
+                {
+                    "name": "sta__projectname__spoke2be",
+                    "subnet": "backend",
+                    "containers": [
+                        "mycontainer"
+                    ]
+                }
+            ]
         },
         {
             //"subscriptionId": "",

@@ -1,7 +1,7 @@
 param vnetName string
 param subnets array
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' existing = {
+resource vnet 'Microsoft.Network/virtualNetworks@2021-03-01' existing = {
   name: vnetName
 }
 

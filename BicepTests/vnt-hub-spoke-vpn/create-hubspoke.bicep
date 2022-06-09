@@ -15,6 +15,8 @@ var spokeAddressRanges = [for spoke in config.spoke: {
   range: spoke.vnet.addressSpace[0]
 }]
 
+var hubSubscriptionId = contains(config.hub, 'subscriptionId') ? config.hub.subscriptionId : subscription().subscriptionId
+
 // Create resource groups
 module rsg 'modules/mod-rsg.bicep' = [for item in vnetConfig: {
   name: '${item.rsg.name}-${postfix}'
@@ -71,13 +73,26 @@ module spokePeerings 'modules/mod-vnet-spoke-peering.bicep' = [for item in confi
 // Deploy Ubuntu VM to use as NAT/Router
 module fw 'modules/mod-vm-linux.bicep' = [for vm in config.hub.vm : {
   name: '${vm.baseName}-${postfix}'
-  scope: resourceGroup(contains(config.hub, 'subscriptionId') ? config.hub.subscriptionId : subscription().subscriptionId, config.hub.rsg.name)
+  scope: resourceGroup(hubSubscriptionId, config.hub.rsg.name)
   dependsOn: vnets
   params: {
     config: vm
     vnetId: resourceId(contains(config.hub, 'subscriptionId') ? config.hub.subscriptionId : subscription().subscriptionId, config.hub.rsg.name, 'Microsoft.Network/virtualNetworks', config.hub.vnet.name)
     location: config.hub.rsg.location
     vmCustomDataBase64: loadFileAsBase64('configs/cloud-init-fw.yml')
+  }
+}]
+
+module privateDns 'modules/mod-private-dns.bicep' = [for dns in config.hub.dns : {
+  name: '${replace(dns,'.','-')}-${postfix}'
+  scope: resourceGroup(hubSubscriptionId, config.hub.rsg.name)
+  dependsOn: [
+    hubPeerings
+    spokePeerings
+  ]
+  params: {
+    name: dns
+    vnets2link: [for (item,i) in vnetConfig: vnets[i].outputs.vnetId]
   }
 }]
 
@@ -99,7 +114,7 @@ module routetables 'modules/mod-routetable.bicep' = [for i in range(0, length(vn
 
 // Create VPN Gateway in hub
 module vgw 'modules/mod-vgw.bicep' = if(contains(config.hub, 'vgw')) {
-  scope: resourceGroup(contains(config.hub, 'subscriptionId') ? config.hub.subscriptionId : subscription().subscriptionId, config.hub.rsg.name)
+  scope: resourceGroup(hubSubscriptionId, config.hub.rsg.name)
   name: '${config.hub.vgw.name}-${postfix}'
   dependsOn: [
     routetables
@@ -108,7 +123,7 @@ module vgw 'modules/mod-vgw.bicep' = if(contains(config.hub, 'vgw')) {
     name: config.hub.vgw.name
     location: config.hub.rsg.location
     tier: config.hub.vgw.tier
-    vnetId: resourceId(contains(config.hub, 'subscriptionId') ? config.hub.subscriptionId : subscription().subscriptionId, config.hub.rsg.name, 'Microsoft.Network/virtualNetworks', config.hub.vnet.name)
+    vnetId: resourceId(hubSubscriptionId, config.hub.rsg.name, 'Microsoft.Network/virtualNetworks', config.hub.vnet.name)
   }
 }
 
@@ -120,6 +135,7 @@ module spokeResource 'modules/mod-spoke-resource.bicep' = [for (spoke, i) in con
   ]
   params: {
     spoke: spoke
+    hub: config.hub
   }
 }]
 

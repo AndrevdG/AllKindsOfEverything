@@ -19,8 +19,12 @@ module hubspoke 'create-hubspoke.bicep' = if (deployHubSpoke) {
   }
 }
 
+// the dependency is only needed because of linking the vnet to the private dns zone(s) in the hub
 module onprem 'create-onprem.bicep' = if (deployOnPrem) {
   name: 'deploy-onprem-${postfix}'
+  dependsOn:[
+    hubspoke
+  ]
   params: {
     config: config
   }

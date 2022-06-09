@@ -5,10 +5,13 @@ param config object
 // only used for deployment names
 param postfix string = utcNow()
 
+var onpremSubscriptionId = contains(config.onprem, 'subscriptionId') ? config.onprem.SubscriptionId : subscription().subscriptionId
+var hubSubscriptionId = contains(config.hub, 'subscriptionId') ? config.hub.subscriptionId : subscription().subscriptionId
+
 // Create resource groups
 module rsg 'modules/mod-rsg.bicep' = {
   name: '${config.onprem.rsg.name}-${postfix}'
-  scope: subscription(contains(config.onprem, 'subscriptionId') ? config.onprem.SubscriptionId : subscription().subscriptionId)
+  scope: subscription(onpremSubscriptionId)
   params: {
     name: config.onprem.rsg.name
     location: config.onprem.rsg.location
@@ -18,7 +21,7 @@ module rsg 'modules/mod-rsg.bicep' = {
 
 // Create vnets
 module vnet 'modules/mod-vnet.bicep' = {
-  scope: resourceGroup(contains(config.onprem, 'subscriptionId') ? config.onprem.subscriptionId : subscription().subscriptionId, config.onprem.rsg.name)
+  scope: resourceGroup(onpremSubscriptionId, config.onprem.rsg.name)
   dependsOn: [
     rsg
   ]
@@ -34,7 +37,7 @@ module vnet 'modules/mod-vnet.bicep' = {
 
 // Create VPN Gateway onprem
 module vgw 'modules/mod-vgw.bicep' = if(contains(config.onprem, 'vgw')) {
-  scope: resourceGroup(contains(config.onprem, 'subscriptionId') ? config.onprem.subscriptionId : subscription().subscriptionId, config.onprem.rsg.name)
+  scope: resourceGroup(onpremSubscriptionId, config.onprem.rsg.name)
   dependsOn:[
     vnet
   ]
@@ -43,21 +46,34 @@ module vgw 'modules/mod-vgw.bicep' = if(contains(config.onprem, 'vgw')) {
     name: config.onprem.vgw.name
     location: config.onprem.rsg.location
     tier: config.onprem.vgw.tier
-    vnetId: resourceId(contains(config.onprem, 'subscriptionId') ? config.onprem.subscriptionId : subscription().subscriptionId, config.onprem.rsg.name, 'Microsoft.Network/virtualNetworks', config.onprem.vnet.name)
+    vnetId: resourceId(onpremSubscriptionId, config.onprem.rsg.name, 'Microsoft.Network/virtualNetworks', config.onprem.vnet.name)
   }
 }
 
 // Deploy Ubuntu VM as onprem resource
 module fw 'modules/mod-vm-linux.bicep' = [for vm in config.onprem.vm : {
   name: '${vm.baseName}-${postfix}'
-  scope: resourceGroup(contains(config.onprem, 'subscriptionId') ? config.onprem.subscriptionId : subscription().subscriptionId, config.onprem.rsg.name)
+  scope: resourceGroup(onpremSubscriptionId, config.onprem.rsg.name)
   dependsOn: [
     vnet
   ]
   params: {
     config: vm
-    vnetId: resourceId(contains(config.onprem, 'subscriptionId') ? config.onprem.subscriptionId : subscription().subscriptionId, config.onprem.rsg.name, 'Microsoft.Network/virtualNetworks', config.onprem.vnet.name)
+    vnetId: resourceId(onpremSubscriptionId, config.onprem.rsg.name, 'Microsoft.Network/virtualNetworks', config.onprem.vnet.name)
     location: config.onprem.rsg.location
+  }
+}]
+
+// Link to the privatelink.blob.windows.net - Normally you would use a dns relay in in azure from your onprem dns
+module privateDns 'modules/mod-private-dns.bicep' = [for dns in config.hub.dns : {
+  name: '${replace(dns,'.','-')}-link-${postfix}'
+  scope: resourceGroup(hubSubscriptionId, config.hub.rsg.name)
+  params: {
+    name: dns
+    vnets2link: [
+      vnet.outputs.vnetId
+    ]
+    linkOnly: true
   }
 }]
 
