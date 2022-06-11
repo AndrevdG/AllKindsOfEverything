@@ -7,6 +7,7 @@ param spokeAddressRanges array = []
 // only used for deployment names
 param postFix string = utcNow()
 
+// Gateway subnet (vpn) should have the spoke routes but not (probably) a default route
 var routesGwSn = [for spoke in spokeAddressRanges: {
   name: 'route-${spoke.name}'
     properties: {
@@ -16,7 +17,8 @@ var routesGwSn = [for spoke in spokeAddressRanges: {
     }
 }]
 
-var routesPerSn = [for item in subnets: !(item.name == 'GatewaySubnet') ? [ 
+// Routes for spokes should have a default route, no other (subnet) routes should be needed in this scenario
+var routesPerSn =  [ 
    {
     name: 'default'
     properties: {
@@ -25,13 +27,14 @@ var routesPerSn = [for item in subnets: !(item.name == 'GatewaySubnet') ? [
       nextHopIpAddress: fwIp
     }
   } 
-]: routesGwSn]
+]
 
+// Create route table, subnets in the hub should have both default route and spoke subnet routes pointing to fw
 resource rt 'Microsoft.Network/routeTables@2021-08-01' = [for (subnet, i) in subnets: if (!(contains(subnet, 'noRouteTable') && subnet.noRouteTable == true)) {
   name: 'sn-${subnet.name}-rt'
   location: location
   properties: {
-    routes: routesPerSn[i]
+    routes: subnet.name == 'GatewaySubnet'? routesGwSn : endsWith(vnetName, '-hub') ? union(routesGwSn, routesPerSn): routesPerSn
   }
 }]
 

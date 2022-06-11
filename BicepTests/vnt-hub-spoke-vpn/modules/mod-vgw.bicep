@@ -45,4 +45,5 @@ resource vgw 'Microsoft.Network/virtualNetworkGateways@2021-08-01' = {
 }
 
 
-output vgwPublicIp string = vgwpip.properties.ipAddress
+// ipAddress is not filled at the first deployment for dynamic pip... resolved this differently
+//output vgwPublicIp string = vgwpip.properties.ipAddress

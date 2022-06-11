@@ -16,6 +16,7 @@ module vm 'mod-vm-linux.bicep' = [for vm in vm2deploy : {
     config: vm
     vnetId: resourceId(contains(spoke, 'subscriptionId') ? spoke.subscriptionId : subscription().subscriptionId, spoke.rsg.name, 'Microsoft.Network/virtualNetworks', spoke.vnet.name)
     location: spoke.rsg.location
+    vmCustomDataBase64: loadFileAsBase64('../configs/cloud-init-vm.yml')
   }
 }]
 

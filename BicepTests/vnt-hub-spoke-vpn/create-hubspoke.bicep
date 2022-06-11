@@ -140,5 +140,3 @@ module spokeResource 'modules/mod-spoke-resource.bicep' = [for (spoke, i) in con
 }]
 
 
-
-output vgwPublicIpHub string = vgw.outputs.vgwPublicIp

@@ -51,7 +51,7 @@ module vgw 'modules/mod-vgw.bicep' = if(contains(config.onprem, 'vgw')) {
 }
 
 // Deploy Ubuntu VM as onprem resource
-module fw 'modules/mod-vm-linux.bicep' = [for vm in config.onprem.vm : {
+module vm 'modules/mod-vm-linux.bicep' = [for vm in config.onprem.vm : {
   name: '${vm.baseName}-${postfix}'
   scope: resourceGroup(onpremSubscriptionId, config.onprem.rsg.name)
   dependsOn: [
@@ -61,6 +61,7 @@ module fw 'modules/mod-vm-linux.bicep' = [for vm in config.onprem.vm : {
     config: vm
     vnetId: resourceId(onpremSubscriptionId, config.onprem.rsg.name, 'Microsoft.Network/virtualNetworks', config.onprem.vnet.name)
     location: config.onprem.rsg.location
+    vmCustomDataBase64: loadFileAsBase64('configs/cloud-init-vm.yml')
   }
 }]
 
@@ -77,4 +78,3 @@ module privateDns 'modules/mod-private-dns.bicep' = [for dns in config.hub.dns :
   }
 }]
 
-output vgwPublicIpOnprem string = vgw.outputs.vgwPublicIp

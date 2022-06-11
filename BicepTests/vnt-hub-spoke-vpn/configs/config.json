@@ -7,6 +7,8 @@
                 // 
                 // f.i. add a vm to linux (or WSL) ssh config: az ssh config --file ~/.ssh/config -n myVM -g AzureADLinuxVM
                 // Or login directly (windows and linux): az ssh vm -n myVM -g AzureADLinuxVM
+                //
+                // Note: you have to change this to an existing object id for a group in your tenant (or a user and change the principalType)
                 "ObjectId": "a0e0374d-4534-4d6b-b49a-f0babd7ae110",
                 "principalType": "Group",
                 "roleDefinitionId": "1c0163c0-47e6-4577-8991-ea5c82e286e4"
