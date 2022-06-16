@@ -123,6 +123,9 @@ resource aadLogin 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = [ 
     type: 'AADLoginForLinux'
     autoUpgradeMinorVersion: true
     typeHandlerVersion: '1.0'
+    suppressFailures: true 
+      // I have had occaisional failures deploying this extension.
+      // However, usually it recovers after a while.
   }
 }]
 
