@@ -1,0 +1,268 @@
+{
+    "general": {
+        "resourceGroupAssignments": [
+            {
+                // adds a groups object id to the 'Virtual Machine Administrator Login', allowing admin login to vms
+                // https://docs.microsoft.com/en-us/azure/active-directory/devices/howto-vm-sign-in-azure-ad-linux
+                // 
+                // f.i. add a vm to linux (or WSL) ssh config: az ssh config --file ~/.ssh/config -n myVM -g AzureADLinuxVM
+                // Or login directly (windows and linux): az ssh vm -n myVM -g AzureADLinuxVM
+                //
+                // Note: you have to change this to an existing object id for a group in your tenant (or a user and change the principalType)
+                "ObjectId": "__objectId__",
+                "principalType": "__principalType__",
+                "roleDefinitionId": "1c0163c0-47e6-4577-8991-ea5c82e286e4"
+            }
+        ],
+        // Only applied if the gateway tier is higher than basic
+        "vpnConnection": {
+            "dhGroup": "ECP256",
+            "ikeEncryption": "AES256",
+            "ikeIntegrity": "SHA256",
+            "ipsecEncryption": "AES256",
+            "ipsecIntegrity": "SHA256",
+            "pfsGroup": "ECP256"
+        }
+    },
+    "hub": {
+        //"subscriptionId": "",
+        "rsg": {
+            "name": "rg-__projectname__-hub",
+            "location": "westeurope"
+        },
+        "vnet": {
+            "name": "vnt-__projectname__-hub",
+            "addressSpace": [
+                "10.10.0.0/16"
+            ],
+            "subnets": [
+                {
+                    "name": "firewall",
+                    "range": "10.10.0.0/24",
+                    "noRouteTable": true,
+                    "nsg": {
+                        "allowedIps": [
+                            "77.249.48.178/32"
+                        ],
+                        "allowInternetForwarding": true
+                    }
+                },
+                {
+                    "name": "shared",
+                    "range": "10.10.1.0/24"
+                },
+                {
+                    "name": "GatewaySubnet",
+                    "range": "10.10.2.0/24",
+                    "noNetworkSecurityGroup": true
+                }
+            ]
+        },
+        "dns": [
+            "privatelink.blob.core.windows.net",
+            "privatelink.vaultcore.azure.net"
+        ],
+        "vm": [
+            {
+                "baseName": "fw-__projectname__-hub",
+                "size": "Standard_B1s",
+                "adminUserName": "fw-admin",
+                "subnet": "firewall",
+                "imageReference": {
+                    "publisher": "canonical",
+                    "offer": "0001-com-ubuntu-server-focal",
+                    "sku": "20_04-lts-gen2",
+                    "version": "latest"
+                },
+                "createPip": true,
+                "createPipStatic": true,
+                "enableIPForwarding": true,
+                "staticIp": true
+            },
+            {
+                "baseName": "vm-__projectname__-hub",
+                "size": "Standard_B1s",
+                "adminUserName": "fw-admin",
+                "subnet": "shared",
+                "imageReference": {
+                    "publisher": "canonical",
+                    "offer": "0001-com-ubuntu-server-focal",
+                    "sku": "20_04-lts-gen2",
+                    "version": "latest"
+                },
+                "staticIp": true
+            }
+        ],
+        "vgw": {
+            "name": "vgw-__projectname__-hub01",
+            "tier": "Basic"
+        }
+    },
+    "spoke": [
+        {
+            //"subscriptionId": "",
+            "rsg": {
+                "name": "rg-__projectname__-spoke1",
+                "location": "westeurope"
+            },
+            "vnet": {
+                "name": "vnt-__projectname__-spoke1",
+                "addressSpace": [
+                    "10.11.0.0/16"
+                ],
+                "subnets": [
+                    {
+                        "name": "frontend",
+                        "range": "10.11.0.0/24"
+                    },
+                    {
+                        "name": "backend",
+                        "range": "10.11.1.0/24"
+                    }
+                ]
+            },
+            "sta": [
+                {
+                    "name": "sta__projectname__spoke1be",
+                    "subnet": "backend",
+                    "containers": [
+                        "mycontainer"
+                    ],
+                    "roles": [
+                        {
+                            "objectId": "__objectId__",
+                            "role": "Storage Blob Data Owner"
+                        }
+                    ]
+                }
+            ],
+            "kv": [
+                {
+                    "name": "kv__projectname__spoke1-be",
+                    "subnet": "backend",
+                    "roles": [
+                        {
+                            "objectId": "__objectId__",
+                            "role": "Key Vault Administrator"
+                        }
+                    ]
+                }
+            ],
+            "vm": [
+                {
+                    "baseName": "vm-__projectname__-spoke1-be",
+                    "size": "Standard_B1s",
+                    "count": 1,
+                    "subnet": "backend",
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "0001-com-ubuntu-server-focal",
+                        "sku": "20_04-lts-gen2",
+                        "version": "latest"
+                    },
+                    "staticIp": true
+                },
+                {
+                    "baseName": "vm-__projectname__-spoke1-fe",
+                    "size": "Standard_B1s",
+                    "count": 1,
+                    "subnet": "frontend",
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "0001-com-ubuntu-server-focal",
+                        "sku": "20_04-lts-gen2",
+                        "version": "latest"
+                    },
+                    "staticIp": true
+                }
+            ]
+        },
+        {
+            //"subscriptionId": "",
+            "rsg": {
+                "name": "rg-__projectname__-spoke2",
+                "location": "westeurope"
+            },
+            "vnet": {
+                "name": "vnt-__projectname__-spoke2",
+                "addressSpace": [
+                    "10.12.0.0/16"
+                ],
+                "subnets": [
+                    {
+                        "name": "frontend",
+                        "range": "10.12.0.0/24"
+                    },
+                    {
+                        "name": "backend",
+                        "range": "10.12.1.0/24"
+                    }
+                ]
+            },
+            "vm": [
+                {
+                    "baseName": "vm-__projectname__-spoke2-be",
+                    "size": "Standard_B1s",
+                    "count": 1,
+                    "subnet": "backend",
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "0001-com-ubuntu-server-focal",
+                        "sku": "20_04-lts-gen2",
+                        "version": "latest"
+                    },
+                    "staticIp": true
+                }
+            ]
+        }
+    ],
+    "onPrem": {
+        //"subscriptionId": "",
+        "rsg": {
+            "name": "rg-__projectname__-onprem",
+            "location": "westeurope"
+        },
+        "vnet": {
+            "name": "vnt-__projectname__-onprem",
+            "addressSpace": [
+                "192.168.0.0/23"
+            ],
+            "subnets": [
+                {
+                    "name": "resource",
+                    "range": "192.168.1.0/25",
+                    "nsg": {
+                        "allowedIps": [
+                            "77.249.48.178/32"
+                        ]
+                    }
+                },
+                {
+                    "name": "GatewaySubnet",
+                    "range": "192.168.0.128/25",
+                    "noNetworkSecurityGroup": true
+                }
+            ]
+        },
+        "vm": [
+            {
+                "baseName": "vm-__projectname__-onprem",
+                "size": "Standard_B1s",
+                "subnet": "resource",
+                "imageReference": {
+                    "publisher": "canonical",
+                    "offer": "0001-com-ubuntu-server-focal",
+                    "sku": "20_04-lts-gen2",
+                    "version": "latest"
+                },
+                "createPip": true,
+                "createPipStatic": true,
+                "staticIp": true
+            }
+        ],
+        "vgw": {
+            "name": "vgw-__projectname__-onprem01",
+            "tier": "Basic"
+        }
+    }
+}

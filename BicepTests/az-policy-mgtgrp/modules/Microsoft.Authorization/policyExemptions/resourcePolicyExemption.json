@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "resourceName": {
+            "type": "string"
+        },
+        "resourceType": {
+            "type": "string"
+        },
+        "policyDefinitionReferenceIds": {
+            "type": "array"
+        },
+        "policyAssignmentId": {
+            "type": "string"
+        },
+        "exemptionCategory": {
+            "type": "string"
+        },
+        "expiresOn": {
+            "type": "string"
+        },
+        "displayName": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        }
+    },
+    "resources": [
+
+        {
+            "name": "[parameters('name')]",
+            "type": "Microsoft.Authorization/policyExemptions",
+            "scope": "[concat(parameters('resourceType'), '/', parameters('resourceName'))]",
+            "apiVersion": "2022-07-01-preview",
+            "properties": {
+                "policyAssignmentId": "[parameters('policyAssignmentId')]",
+                "policyDefinitionReferenceIds": "[parameters('policyDefinitionReferenceIds')]",
+                "exemptionCategory": "[parameters('exemptionCategory')]",
+                "expiresOn": "[if(empty(parameters('expiresOn')),json('null'),parameters('expiresOn'))]",
+                "displayName": "[parameters('displayName')]",
+                "description": "[parameters('description')]"
+            }
+        }
+    ]
+}

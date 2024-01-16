@@ -1,0 +1,14 @@
+{
+    "allowed_rg_locations": {
+        "name": "e765b5de-1225-4ba3-bd56-1ac6695af988"
+    },
+    "allowed_locations": {
+        "name": "e56962a6-4747-49cd-b67b-bf8b01975c4c"
+    },
+    "storage_enforce_https": {
+        "name": "f81e3117-0093-4b17-8a60-82363134f0eb"
+    },
+    "app_service_enforce_tls_1_2": {
+        "name": "f0e6e85b-9b9f-4a4b-b67b-f730d42f1b0b"
+    }
+}

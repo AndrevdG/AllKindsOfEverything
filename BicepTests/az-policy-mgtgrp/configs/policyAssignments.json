@@ -1,0 +1,93 @@
+{
+    "initiatives": {
+        "myInitiative": {
+            "systemAssignedIdentity": true,
+            "policyTypeCustom": true,
+            "parameters": [
+                "listOfAllowedLocations"
+            ],
+            "exemptions": {
+                "e3209603-e27d-448a-9a43-5654d86e02ca": {
+                    "resourcegroup": {
+                        "myRsg1": {
+                            "data": [
+                                {
+                                    "name": "my resourcegroup exemption",
+                                    "description": "because i feel it is needed",
+                                    "expiryDate": "2024-10-15 10:10",
+                                    "policyReferenceId": "allowedRgLocations",
+                                    "exemptioncategory": "Waiver"
+                                }
+                            ],
+                            "resource": {}
+                        }
+                    },
+                    "data": [
+                        {
+                            "name": "my subscription exemption",
+                            "description": "because i feel it is needed",
+                            "expiryDate": "2024-10-15 10:10",
+                            "policyReferenceId": "allowedRgLocations",
+                            "exemptioncategory": "Mitigated"
+                        },
+                        {
+                            "name": "my subscription exemption",
+                            "description": "because i feel it is needed",
+                            "policyReferenceId": "allowedLocations",
+                            "exemptioncategory": "Mitigated"
+                        }
+                    ]
+                }
+            },
+            "nonComplianceMessages": [
+                {
+                    "policyDefinitionReferenceId": "allowedLocations",
+                    "message": "Resource deployments to this location are not allowed. Please contact the Fundament team if your have questions."
+                },
+                {
+                    "policyDefinitionReferenceId": "allowedRgLocations",
+                    "message": "Resource Group deployments to this locations are not allowed. Please contact the Fundament team if your have questions."
+                }
+            ]
+        },
+        "myInitiativeDeployModify": {
+            "policyTypeCustom": true,
+            "systemAssignedIdentity": true,
+            "exemptions": {
+                "e3209603-e27d-448a-9a43-5654d86e02ca": {
+                    "resourcegroup": {
+                        "myRsg1": {
+                            "resources": {
+                                "tstpolicyago01": {
+                                    "type": "Microsoft.Storage/storageAccounts",
+                                    "data": [
+                                        {
+                                            "name": "my special resource exemption",
+                                            "description": "because i feel it is needed",
+                                            "expiryDate": "P2Y",
+                                            "policyReferenceId": "storage_enforce_https",
+                                            "exemptioncategory": "Waiver"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "myRequiredTags": {
+            "policyTypeCustom": true,
+            "parameters": [
+                "tagNames"
+            ],
+            "nonComplianceMessages": [
+                {
+                    "policyDefinitionReferenceId": "rsg-required-tag",
+                    "message": "Certain tags are required for resource groups. Please contact the Fundament team if your have questions."
+                }
+            ]
+        }
+    },
+    "policies": {}
+}

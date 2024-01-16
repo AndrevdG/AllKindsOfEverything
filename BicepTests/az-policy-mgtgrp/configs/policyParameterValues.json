@@ -1,0 +1,14 @@
+{
+    "tagNames": {
+        "value": [
+            "Environment",
+            "Costplace"
+        ]
+    },
+    "listOfAllowedLocations": {
+        "value": [
+            "WestEurope",
+            "NorthEurope"
+        ]
+    }
+}

@@ -1,0 +1,11 @@
+/*
+    First time, or when changing the password, set apiKey with a cleartext value.
+    At the first run the script will encrypt the password.
+    Note: secureApiKey is only decryptable by the user that decrypted it 
+    AND only on the machine it was encrypted on!
+*/
+{
+  "apiKey": "",
+  "originator": "+31232060606",
+  "secureApiKey": "01000000d08c9ddf0115d1118c7a00c04fc297eb010000009bb68c5079652047b78e9eda212d81c70000000002000000000003660000c000000010000000160528fda98a52698ad3f741377e906e0000000004800000a000000010000000463da2a4b63b0b0d5d3984ec2c30f2f53800000094e7ae6a15e96c3ec0029f2b911ffedfad0111c1a28faf04df2e9b12f571c1e0da5f0b44649583b817ea7be90f4d44338881142e84809ddc1400000081f1ec666ebe2aa4836828c7f69d00eed9bc4a16"
+}

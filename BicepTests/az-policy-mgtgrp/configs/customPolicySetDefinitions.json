@@ -1,0 +1,90 @@
+{
+    "myInitiative": {
+        "parameters": {
+            "listOfAllowedLocations": {
+                "type": "Array",
+                "metadata": {
+                    "strongtype": "location",
+                    "displayName": "Allowed resource locations",
+                    "description": "The List of Allowed resource locations"
+                }
+            }
+        },
+        "policyDefinitions": {
+            "allowedLocations": {
+                "policyName": "allowed_locations",
+                "policyTypeCustom": false,
+                "groupNames": [
+                    "General"
+                ],
+                "parameters": {
+                    "listOfAllowedLocations": {
+                        "value": "[[parameters('listOfAllowedLocations')]"
+                    }
+                }
+            },
+            "allowedRgLocations": {
+                "policyName": "allowed_rg_locations",
+                "groupNames": [
+                    "General"
+                ],
+                "parameters": {
+                    "listOfAllowedLocations": {
+                        "value": "[[parameters('listOfAllowedLocations')]"
+                    }
+                }
+            }
+        },
+        "policyDefinitionGroups": [
+            "General"
+        ]
+    },
+    "myInitiativeDeployModify": {
+        "parameters": {},
+        "policyDefinitions": {
+            "app_service_enforce_tls_1_2": {
+                "groupNames": [
+                    "Web"
+                ],
+                "parameters": {}
+            },
+            "storage_enforce_https": {
+                "groupNames": [
+                    "Storage",
+                    "Network",
+                    "Security"
+                ],
+                "parameters": {}
+            }
+        },
+        "policyDefinitionGroups": [
+            "Web",
+            "Storage",
+            "Security",
+            "Network"
+        ]
+    },
+    "myRequiredTags": {
+        "parameters": {
+            "tagNames": {
+                "type": "Array"
+            }
+        },
+        "policyDefinitions": {
+            "rsg-required-tag": {
+                "policyTypeCustom": true,
+                "groupNames": [
+                    "Security"
+                ],
+                "parameters": {
+                    "tagNames": {
+                        "value": "[[parameters('tagNames')]"
+                    }
+                }
+            }
+        },
+        "policyDefinitionGroups": [
+            "Security"
+        ]
+    }
+}

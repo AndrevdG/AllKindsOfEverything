@@ -1,0 +1,56 @@
+name: Test workflow
+on:
+  workflow_dispatch:
+
+jobs:
+  set-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix_powershell.outputs.psmatrix }}
+      # test: ${{ steps.matrix_powershell.outputs.teststring }}
+      test2: ${{ steps.matrix_powershell.outputs.teststring2 }}
+    steps:
+      - name: matrix from powershell
+        id: matrix_powershell
+        shell: pwsh
+        run: |
+          $test = @("One", "Two")
+          Write-Output ('psmatrix={0}' -f ($test | ConvertTo-Json -Compress).replace('"', '`"')) >> $env:GITHUB_OUTPUT
+          # Exporting json from PWSH is somewhat non-trivial, also see: https://github.com/actions/runner/issues/2245
+          # the above
+          Write-Output ("teststring2='{0}'" -f ($test | ConvertTo-Json -Compress)) >> $env:GITHUB_OUTPUT
+          # echo "teststring=Hello world" >> $env:GITHUB_OUTPUT
+          
+      - name: 'test variable local'
+        shell: pwsh
+        run: |
+          # echo ${{ steps.matrix_powershell.outputs.teststring }}
+          echo ${{ steps.matrix_powershell.outputs.teststring2 }}
+          echo "${{ steps.matrix_powershell.outputs.psmatrix }}"
+          "${{ steps.matrix_powershell.outputs.psmatrix }}" | ConvertFrom-Json
+
+  test-variable:
+    needs: set-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'test variable'
+        shell: pwsh
+        env:
+          o1: ${{needs.set-matrix.outputs.matrix}}
+          o2: ${{needs.set-matrix.outputs.test2}}
+        run: |
+          echo $env:o1
+          echo $env:o2
+          $env:o2 | ConvertFrom-Json
+          "${{needs.set-matrix.outputs.matrix}}" | ConvertFrom-Json
+
+  # do-something:
+  #   needs: set-matrix
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix: ${{fromJson(needs.set-matrix.outputs.matrix)}}
+  #   steps:
+  #     - name: 'test variable'
+  #       shell: pwsh
+  #       run: echo $env:matrix
+

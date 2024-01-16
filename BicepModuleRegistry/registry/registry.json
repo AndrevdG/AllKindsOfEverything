@@ -1,0 +1,12 @@
+{
+    "resourceGroup": {
+        "name": "rg-we-bicepregistry",
+        "location": "westeurope"
+    },
+    "acr": {
+        "name": "acrautomagicaleu",
+        "sku": "basic",
+        "adminUserEnabled": false
+    }
+
+}

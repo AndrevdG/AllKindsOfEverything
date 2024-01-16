@@ -1,0 +1,58 @@
+{
+    "rsg-required-tag": {
+        "displayName": "Require tag(s) on resource groups",
+        "description": "Require tag(s) on resource groups",
+        "metadata": {
+            "category": "Management"
+        },
+        "mode": "All",
+        "parameters": {
+            "tagNames": {
+                "type": "Array",
+                "metadata": {
+                    "displayName": "Required tag(s)",
+                    "description": "Required tag(s) on resource groups"
+                }
+            },
+            "effect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect",
+                    "description": "Enable or disable the execution of the policy"
+                },
+                "allowedValues": [
+                    "Deny",
+                    "Audit",
+                    "Disabled"
+                ],
+                "defaultValue": "Deny"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Resources/subscriptions/resourceGroups"
+                    },
+                    {
+                        "count": {
+                            "value": "[parameters('tagNames')]",
+                            "name": "tagname",
+                            "where": {
+                                "not": {
+                                    "field": "tags",
+                                    "containsKey": "[current('tagname')]"
+                                }
+                            }
+                        },
+                        "greater": 0
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('effect')]"
+            }
+        }
+    }
+}

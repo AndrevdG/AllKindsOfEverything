@@ -1,0 +1,43 @@
+name: Deploy bicep modules to registry
+on:
+  # push:
+  #   paths:
+  #     - BicepModuleRegistry/**
+  workflow_dispatch:
+
+permissions:
+      id-token: write
+      contents: read
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: actions/checkout@v3
+      - name: 'Deploy Azure Container Registry'
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az bicep upgrade
+            az deployment sub create --location westeurope --template-file BicepModuleRegistry/registry/main.bicep
+      - name: 'Get changed bicep modules in commit'
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if ($env:RUNNER_DEBUG) { $DebugPreference = 'Continue' }
+          import-module ./BicepModuleRegistry/helpers/BicepRegistryHelper.psm1
+          $modules = _GetChangedModulesFromGh -token ($env:GITHUB_TOKEN | ConvertTo-SecureString -AsPlainText -Force) `
+            -ghRepo $env:GITHUB_REPOSITORY `
+            -ghRef $env:GITHUB_REF `
+            -verbose
+          ("changed_modules={0}" -f $modules -join ";") | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: 'test variable'
+        shell: pwsh
+        run: $env:changed_modules
+
