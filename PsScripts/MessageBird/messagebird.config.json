@@ -1,13 +1,8 @@
-/*
-    First time, or when changing the password, set apiKey with a cleartext value.
-    At the first run the script will encrypt the password.
-    Note: secureApiKey is only decryptable by the user that decrypted it 
-    AND only on the machine it was encrypted on!
-*/
 {
   "apiKey": "",
   "originator": "+31232060606",
   "secureApiKey": "",
+  "statusTimeoutInMins": 5,
   "writeLog": true,
   "logFileRelativePath": "/log",
   "logFileBaseName": "messagebird.log"

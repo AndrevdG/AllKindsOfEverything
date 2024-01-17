@@ -55,7 +55,10 @@ Function Get-LogFile {
     if ($logFileRelativePath) {
         $logFilePath = Join-Path -Path $PSScriptRoot -ChildPath $logFileRelativePath
         [void](New-Item -Path $logFilePath -ItemType Directory -Force)
+    } else {
+        $logFilePath = $PSScriptRoot
     }
+
     $logFileFullname = Join-Path -Path $logFilePath -ChildPath ("{0}-{1}.{2}" -f $logFileName, (Get-Date -Format FileDate), $logExtension)
     if (-Not (Test-Path -Path $logFileFullname)){
         $log = New-Item -Path $logFileFullname -ItemType File
@@ -157,15 +160,15 @@ Function Get-MessageBirdDeliveryStatus {
         [string]$messageId,
         [Parameter(Mandatory=$true)]
         [string]$apiKey,
-        [Parameter(Mandatory=$false)]
-        [int]$timeoutInMins = 5
+        [Parameter(Mandatory=$true)]
+        [int]$statusTimeoutInMins
     )
     $now = Get-Date
     $headers = @{
         Authorization = "AccessKey $apiKey"
     }
     $uri = ("https://rest.messagebird.com/messages/{0}" -f $messageId)
-    while ((Get-Date) -ne $now.AddMinutes($timeoutInMins)) {
+    while ((Get-Date) -ne $now.AddMinutes($statusTimeoutInMins)) {
         Try {
             $response = Invoke-RestMethod -Method Get -Uri $uri -Headers $headers -ErrorAction Stop
         } Catch {
@@ -199,6 +202,7 @@ if ($config.writeLog) {
 $config = Update-Config -configFileFullname $configFileFullname -config $config
 # Extract and decrypt the secureApiKey
 $apiKey = $config.secureApiKey | ConvertTo-SecureString | ConvertFrom-SecureString -AsPlainText
+$statusTimeoutInMins = $config.statusTimeoutInMins ? $config.statusTimeoutInMins : 5
 
 # send the message
 Write-Log -message ("Sending message '{0}'" -f $message) -logFileFullname $logFile
