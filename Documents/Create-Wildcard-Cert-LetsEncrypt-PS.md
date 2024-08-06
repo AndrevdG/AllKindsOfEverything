@@ -18,5 +18,11 @@ the request to be successfully created:
 $pArgs = @{
     CFToken = (Read-Host 'API Token' -AsSecureString)
 }
-New-PACertificate *.example.com -AcceptTOS -Plugin Cloudflare -PluginArgs $pArgs
+New-PACertificate *.example.com -AcceptTOS -Plugin Cloudflare -PluginArgs $pArgs | Format-List
 ```
+
+Note: by default the generated certificates will be saved in a local folder within your user profile, like:
+```
+C:\Users\<UserName>\AppData\Local\Posh-ACME\LE_PROD\<id>\<DomainName>
+```
+If you used Format-List as in the example, the paths will be displayed when the cmdlet finishes
