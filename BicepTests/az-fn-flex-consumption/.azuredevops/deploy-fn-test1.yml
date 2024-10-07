@@ -1,0 +1,62 @@
+parameters:
+- name: iteration
+  displayName: 'Iteration'
+  type: string
+  default: 'test3'
+  values: [
+    'test1',
+    'test2',
+    'test3'
+  ]
+- name: resourceGroupName
+  displayName: 'Name of the resource group'
+  type: string 
+  default: 'rg-fnfcp'
+
+jobs:
+- job: 'DeployFunctionApp'
+  displayName: 'Deploy Function App'
+  steps:
+    - checkout: self
+
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: Provision Function App Resources
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: spn-automagical
+        resourceGroupName: ${{ parameters.resourceGroupName }}
+        location: 'Sweden Central'
+        csmFile: $(System.DefaultWorkingDirectory)/bicep/${{ parameters.iteration }}/main.bicep
+        deploymentOutputs: functionResources
+
+    - task: PowerShell@2
+      displayName: 'Deployment output to variables'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $output = '$(functionResources)' | ConvertFrom-Json
+          $output | Get-Member -MemberType NoteProperty `
+            | Where-Object {
+              write-host ("setting variable={0} to value={1}" -f $_.name, $output.$($_.name).value)
+              write-host ("##vso[task.setvariable variable={0};]{1}" -f $_.name, $output.$($_.name).value)
+            }
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/functionApp'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Pipeline.Workspace)/functionApp.zip'
+
+    - task: AzureFunctionApp@2
+      displayName: Deploy Functions
+      inputs:
+        azureSubscription: spn-automagical
+        appType: functionAppLinux
+        appName: $(fnName)
+        isFlexConsumption: true
+        resourceGroupName: ${{ parameters.resourceGroupName }}
+        package: $(Pipeline.Workspace)/functionApp.zip
+        deploymentMethod: 'runFromPackage'
+        
