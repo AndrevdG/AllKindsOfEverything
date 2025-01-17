@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/global-settings-schema.json",
+  "pacOwnerId": "23b77117-2faa-4c0a-918e-ef7cc910ca8c",
+  "pacEnvironments": [
+    {
+      "pacSelector": "tenant",
+      "cloud": "AzureCloud",
+      "tenantId": "9620a59d-ee15-467b-9db2-3ea57cc86153",
+      "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/automagical-tst",
+      "desiredState": {
+        "strategy": "full",
+        "excludedPolicyAssignments": [],
+        "keepDfcSecurityAssignments": false,
+        "excludedScopes": [],
+        "excludedPolicySetDefinitions": [],
+        "excludedPolicyDefinitions": []
+      },
+      "globalNotScopes": [
+        "/subscriptions/e3209603-e27d-448a-9a43-5654d86e02ca"
+      ],
+      "managedIdentityLocation": "westeurope"
+    }
+  ]
+}

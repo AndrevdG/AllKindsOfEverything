@@ -1,0 +1,32 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
+    "nodeName": "/Root/",
+    "scope": {
+        "tenant": [
+            "/providers/Microsoft.Management/managementGroups/automagical-tst"
+        ],
+        "dev": []
+    },
+    "children": [
+        {
+            "nodeName": "ResourceGroupTags",
+            "assignment": {
+                "name": "Require-Rsg-Tags",
+                "displayName": "Required tags on Resource Groups",
+                "description": "Required tags on Resource Groups"
+            },
+            "definitionEntry": {
+                "policySetName": "Macaw-Required-Tags-Rsg",
+                "displayName": "Macaw: Require tags on resource group"
+            },
+            "parameters": {
+                "excludedResourceGroups": "__tagExcludedResourceGroups__"
+            },
+            "nonComplianceMessages": [
+                {
+                    "message": "Resource Groups must have a minimal set of tags"
+                }
+            ]
+        }
+    ]
+}

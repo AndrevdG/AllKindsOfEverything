@@ -1,0 +1,56 @@
+{
+    "name": "Macaw-Required-Tags-Rsg",
+    "properties": {
+        "policyType": "Custom",
+        "displayName": "Macaw: Require tags on resource group",
+        "description": "This policy initiative is a group tags that are required on every Resource Group.",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Resource Group Management",
+            "alzCloudEnvironments": [
+                "AzureCloud",
+                "AzureChinaCloud",
+                "AzureUSGovernment"
+            ]
+        },
+        "parameters": {
+            "excludedResourceGroups": {
+                "type": "Array",
+                "metadata": {
+                    "displayName": "Excluded Resource Groups",
+                    "description": "Array of resource group names that are excluded from this policy"
+                },
+                "defaultValue": []
+            }
+        },
+        "policyDefinitions": [
+            {
+                "policyDefinitionReferenceId": "rsg-required-tag-1",
+                "groupNames": [],
+                "parameters": {
+                    "tagName": {
+                        "value": "Environment"
+                    },
+                    "excludedResourceGroups": {
+                        "value": "[parameters('excludedResourceGroups')]"
+                    }
+                },
+                "policyDefinitionName": "deny-resourcegroup-without-tags"
+            },
+            {
+                "policyDefinitionReferenceId": "rsg-required-tag-3",
+                "groupNames": [],
+                "parameters": {
+                    "tagName": {
+                        "value": "Owner"
+                    },
+                    "excludedResourceGroups": {
+                        "value": "[parameters('excludedResourceGroups')]"
+                    }
+                },
+                "policyDefinitionName": "deny-resourcegroup-without-tags"
+            }
+        ],
+        "policyDefinitionGroups": []
+    }
+}

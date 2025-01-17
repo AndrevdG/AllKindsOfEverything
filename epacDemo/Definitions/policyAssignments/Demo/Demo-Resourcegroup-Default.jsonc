@@ -1,0 +1,29 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
+    "nodeName": "/Root/",
+    "scope": {
+        "tenant": [
+            "/subscriptions/c7f3f29b-9c8d-4cd0-bd6c-67362034c959/resourceGroups/epac-demo"
+        ],
+        "dev": []
+    },
+    "children": [
+        {
+            "nodeName": "Storage",
+            "assignment": {
+                "name": "Enforce-GR-Storage",
+                "displayName": "Enforce recommended guardrails for Storage.",
+                "description": "This initiative assignment enables additional ALZ guardrails for Storage."
+            },
+            "definitionEntry": {
+                "policySetName": "Enforce-Guardrails-Storage",
+                "displayName": "Enforce recommended guardrails for Storage"
+            },
+            "nonComplianceMessages": [
+                {
+                    "message": "Recommended guardrails must be enforced for Storage"
+                }
+            ]
+        }
+    ]
+}
