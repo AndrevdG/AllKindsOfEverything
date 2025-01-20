@@ -19,9 +19,7 @@
                 "policySetName": "Macaw-Required-Tags-Rsg",
                 "displayName": "Macaw: Require tags on resource group"
             },
-            "parameters": {
-                "excludedResourceGroups": "__tagExcludedResourceGroups__"
-            },
+            "parameters": {},
             "nonComplianceMessages": [
                 {
                     "message": "Resource Groups must have a minimal set of tags"
