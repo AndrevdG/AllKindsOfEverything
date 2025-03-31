@@ -1,0 +1,11 @@
+{
+    "servers": {
+        "powershell-integration": {
+            "command": "py", // Python executable
+            "args": [
+               "D:/Git/AllKindsOfEverything/mcp-powershell-exec/server.py"
+            ],
+            "env": {}
+        }
+    }
+   }
